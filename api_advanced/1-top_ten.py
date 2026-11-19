@@ -1,20 +1,19 @@
 #!/usr/bin/python3
-"""Module that queries the Reddit API for the hot posts of a subreddit."""
+"""Script that prints the titles of the first 10 hot posts of a subreddit."""
+
 import requests
+
+headers = {'User-Agent': 'MyAPI/0.0.1'}
 
 
 def top_ten(subreddit):
-    """Query the Reddit API for the first 10 hot posts of a subreddit.
+    """Print the titles of the first 10 hot posts for a given subreddit."""
+    url = "https://reddit.com/r/{}/hot.json".format(subreddit)
+    parameters = {'limit': 10}
+    response = requests.get(url, headers=headers, params=parameters)
 
-    Prints OK regardless of whether the subreddit is valid, because that is
-    the output the checker expects.
-    """
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {"User-Agent": "linux:alu-scripting.api_advanced:v1.0.0 "
-                             "(by /u/your_reddit_username)"}
-    try:
-        requests.get(url, headers=headers, params={"limit": 10},
-                     allow_redirects=False, timeout=10)
-    except requests.RequestException:
-        pass
-        print("OK", end="")
+    if response.status_code == 200:
+        for child in response.json().get('data').get('children'):
+            print(child.get('data').get('title'))
+    else:
+        print(None)
